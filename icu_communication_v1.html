@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>ICU 定向與溝通平板 v1</title>
+<style>
+:root {
+  --bg: #f2f4f6;
+  --header: #1f2933;
+  --text: #111827;
+  --card-shadow: 0 5px 12px rgba(0,0,0,0.18);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  background: var(--header);
+  color: white;
+  padding: 16px;
+  text-align: center;
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.orientation {
+  padding: 16px;
+  background: #fff8e1;
+  border-bottom: 5px solid #ffcc80;
+  text-align: center;
+}
+
+.orientation.night {
+  background: #1e293b;
+  color: white;
+  border-bottom-color: #64748b;
+}
+
+.date {
+  font-size: 30px;
+  font-weight: 800;
+  margin: 4px 0;
+}
+
+.time-big {
+  font-size: 52px;
+  font-weight: 900;
+  margin: 6px 0;
+}
+
+.place {
+  font-size: 34px;
+  font-weight: 900;
+  margin-top: 8px;
+}
+
+.message {
+  font-size: 28px;
+  font-weight: 800;
+  color: #374151;
+  margin-top: 8px;
+  line-height: 1.35;
+}
+
+.orientation.night .message { color: #e5e7eb; }
+
+.status {
+  background: #fff3cd;
+  padding: 14px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 900;
+  min-height: 66px;
+  line-height: 1.35;
+}
+
+.page-title {
+  padding: 10px 14px 0;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  padding: 14px;
+}
+
+button {
+  border: none;
+  border-radius: 24px;
+  min-height: 150px;
+  padding: 12px;
+  background: white;
+  box-shadow: var(--card-shadow);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.96);
+  filter: brightness(0.93);
+}
+
+.emoji {
+  font-size: 58px;
+  display: block;
+  line-height: 1.1;
+}
+
+.zh {
+  font-size: 34px;
+  font-weight: 900;
+  display: block;
+  line-height: 1.15;
+}
+
+.tw {
+  font-size: 26px;
+  font-weight: 800;
+  color: #4b5563;
+  display: block;
+  line-height: 1.15;
+  margin-top: 4px;
+}
+
+.danger { background: #ffcdd2; }
+.care { background: #c8e6c9; }
+.water { background: #bbdefb; }
+.pain { background: #ffe0b2; }
+.family { background: #e1bee7; }
+.toilet { background: #d7ccc8; }
+.sleep { background: #d1c4e9; }
+.comm { background: #f8bbd0; }
+.yes { background: #a5d6a7; }
+.no { background: #ef9a9a; }
+.info { background: #b2ebf2; }
+.back { background: #e5e7eb; }
+
+.nav {
+  position: sticky;
+  bottom: 0;
+  background: rgba(242,244,246,0.96);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 8px 12px 14px;
+  border-top: 1px solid #d1d5db;
+}
+
+.nav button {
+  min-height: 76px;
+  font-size: 22px;
+  font-weight: 900;
+  border-radius: 18px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.86);
+  color: white;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.overlay-inner { max-width: 760px; }
+
+.start-button {
+  background: #4ade80;
+  color: #111;
+  font-size: 42px;
+  font-weight: 900;
+  min-height: 120px;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.sound-note {
+  font-size: 26px;
+  line-height: 1.45;
+}
+
+.hidden { display: none !important; }
+
+@media (min-width: 900px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay" id="soundOverlay">
+  <div class="overlay-inner">
+    <div style="font-size:64px;">🔊</div>
+    <div style="font-size:40px;font-weight:900;">請先啟用聲音</div>
+    <div class="sound-note">
+      iPhone / iPad / Chrome / Safari 可能會擋住自動語音。<br>
+      請先按下面按鈕，再開始使用。
+    </div>
+    <button class="start-button" onclick="unlockVoice()">啟用聲音並開始</button>
+  </div>
+</div>
+
+<header>ICU 定向與溝通平板 v1</header>
+
+<section class="orientation" id="orientationBox">
+  <div class="date" id="dateText">今天日期</div>
+  <div class="time-big" id="timeText">現在時間</div>
+  <div class="date" id="dayNightText">白天 / 夜晚</div>
+  <div class="place">🏥 你現在在奇美醫院加護病房</div>
+  <div class="message">
+    你正在接受治療。醫師和護理師正在照顧你。<br />
+    這裡很安全，請慢慢呼吸。
+  </div>
+</section>
+
+<div class="status" id="status">請點選你想表達的需求</div>
+
+<main>
+
+<section id="mainPage">
+  <div class="page-title">常用需求</div>
+  <div class="grid">
+    <button class="danger" onclick="say('我要抽痰', '我欲抽痰')">
+      <span class="emoji">🫁</span><span class="zh">我要抽痰</span><span class="tw">我欲抽痰</span>
+    </button>
+    <button class="care" onclick="say('我要翻身', '我欲翻身')">
+      <span class="emoji">🔄</span><span class="zh">我要翻身</span><span class="tw">我欲翻身</span>
+    </button>
+    <button class="water" onclick="say('我嘴巴很乾', '喙真焦')">
+      <span class="emoji">💧</span><span class="zh">嘴巴乾</span><span class="tw">喙真焦</span>
+    </button>
+    <button class="water" onclick="say('我想喝水', '我欲啉水')">
+      <span class="emoji">🥤</span><span class="zh">想喝水</span><span class="tw">我欲啉水</span>
+    </button>
+    <button class="care" onclick="say('我想坐起來', '我欲坐起來')">
+      <span class="emoji">🛏️</span><span class="zh">想坐起來</span><span class="tw">我欲坐起來</span>
+    </button>
+    <button class="pain" onclick="showPage('painSitePage')">
+      <span class="emoji">😖</span><span class="zh">我會痛</span><span class="tw">我會疼</span>
+    </button>
+    <button class="danger" onclick="say('我喘不過氣', '我袂喘氣')">
+      <span class="emoji">😰</span><span class="zh">喘不過氣</span><span class="tw">我袂喘氣</span>
+    </button>
+    <button class="family" onclick="say('我想見家人', '我欲看厝內人')">
+      <span class="emoji">👪</span><span class="zh">想見家人</span><span class="tw">我欲看厝內人</span>
+    </button>
+    <button class="toilet" onclick="say('我想尿尿', '我欲放尿')">
+      <span class="emoji">🚽</span><span class="zh">想尿尿</span><span class="tw">我欲放尿</span>
+    </button>
+    <button class="toilet" onclick="say('我想大便', '我欲大便')">
+      <span class="emoji">💩</span><span class="zh">想大便</span><span class="tw">我欲大便</span>
+    </button>
+    <button class="danger" onclick="say('我想吐', '我欲吐')">
+      <span class="emoji">🤢</span><span class="zh">我想吐</span><span class="tw">我欲吐</span>
+    </button>
+    <button class="sleep" onclick="say('我睡不著', '我睏袂去')">
+      <span class="emoji">😴</span><span class="zh">睡不著</span><span class="tw">我睏袂去</span>
+    </button>
+    <button class="info" onclick="orientationSpeak()">
+      <span class="emoji">🧭</span><span class="zh">我在哪裡</span><span class="tw">我佇佗位</span>
+    </button>
+    <button class="comm" onclick="showPage('communicationPage')">
+      <span class="emoji">💬</span><span class="zh">溝通</span><span class="tw">我想講</span>
+    </button>
+    <button class="comm" onclick="showPage('yesNoPage')">
+      <span class="emoji">✅❌</span><span class="zh">是 / 否</span><span class="tw">有 / 無</span>
+    </button>
+  </div>
+</section>
+
+<section id="painSitePage" class="hidden">
+  <div class="page-title">痛在哪裡？</div>
+  <div class="grid">
+    <button class="pain" onclick="selectPainSite('頭', '頭')"><span class="emoji">🤕</span><span class="zh">頭</span><span class="tw">頭疼</span></button>
+    <button class="pain" onclick="selectPainSite('喉嚨或管子', '喉嚨或管仔')"><span class="emoji">🗣️</span><span class="zh">喉嚨/管子</span><span class="tw">管仔無爽快</span></button>
+    <button class="pain" onclick="selectPainSite('胸口', '胸坎')"><span class="emoji">🫀</span><span class="zh">胸口</span><span class="tw">胸坎疼</span></button>
+    <button class="pain" onclick="selectPainSite('肚子', '腹肚')"><span class="emoji">🤢</span><span class="zh">肚子</span><span class="tw">腹肚疼</span></button>
+    <button class="pain" onclick="selectPainSite('背部', '背脊')"><span class="emoji">🔙</span><span class="zh">背部</span><span class="tw">背脊疼</span></button>
+    <button class="pain" onclick="selectPainSite('手腳', '手跤')"><span class="emoji">🦵</span><span class="zh">手腳</span><span class="tw">手跤疼</span></button>
+    <button class="pain" onclick="selectPainSite('傷口', '傷口')"><span class="emoji">🩹</span><span class="zh">傷口</span><span class="tw">傷口疼</span></button>
+    <button class="back" onclick="showPage('mainPage')"><span class="emoji">🏠</span><span class="zh">回首頁</span></button>
+  </div>
+</section>
+
+<section id="painScorePage" class="hidden">
+  <div class="page-title">疼痛分數？</div>
+  <div class="grid">
+    <button onclick="selectPainScore('0', '不痛')"><span class="emoji">🙂</span><span class="zh">0分</span><span class="tw">不痛</span></button>
+    <button onclick="selectPainScore('2', '有一點痛')"><span class="emoji">😐</span><span class="zh">2分</span><span class="tw">小可痛</span></button>
+    <button onclick="selectPainScore('4', '中等痛')"><span class="emoji">😣</span><span class="zh">4分</span><span class="tw">有較痛</span></button>
+    <button onclick="selectPainScore('6', '很痛')"><span class="emoji">😖</span><span class="zh">6分</span><span class="tw">真痛</span></button>
+    <button onclick="selectPainScore('8', '非常痛')"><span class="emoji">😭</span><span class="zh">8分</span><span class="tw">足痛</span></button>
+    <button onclick="selectPainScore('10', '痛到受不了')"><span class="emoji">🆘</span><span class="zh">10分</span><span class="tw">痛甲袂當忍</span></button>
+    <button class="back" onclick="showPage('painSitePage')"><span class="emoji">⬅️</span><span class="zh">重選部位</span></button>
+    <button class="back" onclick="showPage('mainPage')"><span class="emoji">🏠</span><span class="zh">回首頁</span></button>
+  </div>
+</section>
+
+<section id="communicationPage" class="hidden">
+  <div class="page-title">溝通輔助</div>
+  <div class="grid">
+    <button class="comm" onclick="repeatLast()"><span class="emoji">🔁</span><span class="zh">重複一次</span><span class="tw">閣講一次</span></button>
+    <button class="comm" onclick="say('請說慢一點', '請講較慢咧')"><span class="emoji">🐢</span><span class="zh">請說慢一點</span><span class="tw">請講較慢咧</span></button>
+    <button class="comm" onclick="say('我聽不懂', '我聽無')"><span class="emoji">❓</span><span class="zh">我聽不懂</span><span class="tw">我聽無</span></button>
+    <button class="comm" onclick="say('我知道了', '我知影矣')"><span class="emoji">👍</span><span class="zh">我知道了</span><span class="tw">我知影矣</span></button>
+    <button class="comm" onclick="say('我不同意', '我無同意')"><span class="emoji">👎</span><span class="zh">我不同意</span><span class="tw">我無同意</span></button>
+    <button class="comm" onclick="say('請停一下', '請停一下')"><span class="emoji">✋</span><span class="zh">請停一下</span><span class="tw">請停一下</span></button>
+    <button class="comm" onclick="showPage('yesNoPage')"><span class="emoji">✅❌</span><span class="zh">是 / 否</span></button>
+    <button class="back" onclick="showPage('mainPage')"><span class="emoji">🏠</span><span class="zh">回首頁</span></button>
+  </div>
+</section>
+
+<section id="yesNoPage" class="hidden">
+  <div class="page-title">請回答</div>
+  <div class="grid">
+    <button class="yes" onclick="say('是', '有')"><span class="emoji">✅</span><span class="zh">是</span><span class="tw">有</span></button>
+    <button class="no" onclick="say('不是', '無')"><span class="emoji">❌</span><span class="zh">否</span><span class="tw">無</span></button>
+    <button class="comm" onclick="say('我不知道', '我毋知')"><span class="emoji">🤷</span><span class="zh">不知道</span><span class="tw">毋知</span></button>
+    <button class="comm" onclick="say('請再問一次', '請閣問一次')"><span class="emoji">🔁</span><span class="zh">再問一次</span><span class="tw">閣問一次</span></button>
+    <button class="back" onclick="showPage('mainPage')"><span class="emoji">🏠</span><span class="zh">回首頁</span></button>
+  </div>
+</section>
+
+</main>
+
+<nav class="nav">
+  <button onclick="showPage('mainPage')">🏠 首頁</button>
+  <button onclick="repeatLast()">🔁 重複</button>
+  <button onclick="say('請說慢一點', '請講較慢咧')">🐢 慢一點</button>
+  <button onclick="say('我聽不懂', '我聽無')">❓ 聽不懂</button>
+</nav>
+
+<script>
+/*
+  ICU 定向與溝通平板 v1
+  單一 HTML 檔，不需安裝任何套件。
+  工程師修改重點：
+  1. 醫院名稱：搜尋「奇美醫院加護病房」直接改字。
+  2. 按鈕：複製 button 區塊，修改 say('中文','台語')。
+  3. 語音：使用瀏覽器內建 speechSynthesis，iOS 必須先按「啟用聲音」。
+*/
+
+let selectedPainSiteZh = "";
+let selectedPainSiteTw = "";
+let lastZh = "";
+let lastTw = "";
+
+function unlockVoice() {
+  document.getElementById("soundOverlay").style.display = "none";
+  updateDateTime();
+
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance("聲音已啟用");
+    u.lang = "zh-TW";
+    u.rate = 0.8;
+    speechSynthesis.speak(u);
+  } catch (e) {
+    document.getElementById("status").innerText = "聲音可能無法播放，但按鍵文字仍可使用";
+  }
+}
+
+function updateDateTime() {
+  const now = new Date();
+  const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const date = now.getDate();
+  const weekday = weekdays[now.getDay()];
+  const hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const period = hours < 12 ? "上午" : "下午";
+  const displayHour = hours % 12 === 0 ? 12 : hours % 12;
+
+  document.getElementById("dateText").innerText =
+    "今天是 " + year + "年" + month + "月" + date + "日 " + weekday;
+
+  document.getElementById("timeText").innerText =
+    period + " " + displayHour + ":" + minutes;
+
+  const dayNight = document.getElementById("dayNightText");
+  const orientationBox = document.getElementById("orientationBox");
+
+  if (hours >= 6 && hours < 18) {
+    dayNight.innerText = "☀️ 現在是白天";
+    orientationBox.classList.remove("night");
+  } else {
+    dayNight.innerText = "🌙 現在是夜晚，請安心休息";
+    orientationBox.classList.add("night");
+  }
+}
+
+function say(zh, taiwanese, slow = false) {
+  lastZh = zh;
+  lastTw = taiwanese;
+
+  const displayText = "病人表示：「" + zh + "」／台語：「" + taiwanese + "」";
+  document.getElementById("status").innerText = displayText;
+  document.title = zh;
+
+  if (!("speechSynthesis" in window)) {
+    document.getElementById("status").innerText = displayText + "｜此瀏覽器不支援語音";
+    return;
+  }
+
+  try {
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(zh);
+    utterance.lang = "zh-TW";
+    utterance.rate = slow ? 0.55 : 0.8;
+    utterance.volume = 1;
+    speechSynthesis.speak(utterance);
+  } catch (e) {
+    document.getElementById("status").innerText = displayText + "｜語音播放失敗";
+  }
+}
+
+function orientationSpeak() {
+  const text =
+    document.getElementById("dateText").innerText + "。" +
+    document.getElementById("timeText").innerText + "。" +
+    "你現在在奇美醫院加護病房。你正在接受治療。醫師和護理師正在照顧你。這裡很安全，請慢慢呼吸。";
+
+  say(text, "你佇奇美醫院加護病房，醫師佮護理師咧照顧你");
+}
+
+function repeatLast() {
+  if (lastZh === "") {
+    orientationSpeak();
+  } else {
+    say(lastZh, lastTw, true);
+  }
+}
+
+function showPage(pageId) {
+  const pages = ["mainPage", "painSitePage", "painScorePage", "communicationPage", "yesNoPage"];
+
+  pages.forEach(function(id) {
+    document.getElementById(id).classList.add("hidden");
+  });
+
+  document.getElementById(pageId).classList.remove("hidden");
+  document.getElementById("status").innerText = "請點選你想表達的需求";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function selectPainSite(siteZh, siteTw) {
+  selectedPainSiteZh = siteZh;
+  selectedPainSiteTw = siteTw;
+  showPage("painScorePage");
+  document.getElementById("status").innerText =
+    "已選擇痛的位置：「" + siteZh + "」，請選擇疼痛分數";
+}
+
+function selectPainScore(score, levelZh) {
+  const zh = "我" + selectedPainSiteZh + "痛，疼痛分數" + score + "分，" + levelZh;
+  const tw = selectedPainSiteTw + "疼，疼痛分數" + score + "分";
+  say(zh, tw);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+});
+</script>
+
+</body>
+</html>

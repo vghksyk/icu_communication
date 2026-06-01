@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<title>ICU 定向與溝通平板｜中台英版</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto Sans TC",Arial,sans-serif;background:#f2f4f6;color:#111827}header{background:#1f2933;color:white;padding:16px;text-align:center;font-size:34px;font-weight:900}.orientation{background:#fff8e1;border-bottom:5px solid #ffcc80;padding:18px;text-align:center}.orientation.night{background:#1e293b;color:white;border-bottom-color:#64748b}.orientation-main{font-size:42px;font-weight:900;line-height:1.25}.orientation-sub{font-size:30px;font-weight:800;line-height:1.35;margin-top:8px}.status{background:#fff3cd;padding:16px;text-align:center;font-size:32px;font-weight:900;min-height:74px;line-height:1.35}.lang-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px;background:#e5e7eb}.lang-bar button{min-height:84px;font-size:28px;font-weight:900;border-radius:18px}.page-title{padding:12px 16px 0;font-size:34px;font-weight:900}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px}button{border:none;border-radius:28px;min-height:215px;padding:14px;background:white;box-shadow:0 5px 12px rgba(0,0,0,.18);touch-action:manipulation;cursor:pointer}button:active{transform:scale(.96);filter:brightness(.93)}.emoji{font-size:100px;display:block;line-height:1.05}.label{font-size:40px;font-weight:900;display:block;line-height:1.12}.danger{background:#ffcdd2}.care{background:#c8e6c9}.water{background:#bbdefb}.pain{background:#ffe0b2}.family{background:#e1bee7}.toilet{background:#d7ccc8}.sleep{background:#d1c4e9}.comm{background:#f8bbd0}.yes{background:#a5d6a7}.no{background:#ef9a9a}.info{background:#b2ebf2}.back{background:#e5e7eb}.home{background:#fde68a}.nav{position:sticky;bottom:0;background:rgba(242,244,246,.96);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 12px 14px;border-top:1px solid #d1d5db}.nav button{min-height:84px;font-size:24px;font-weight:900;border-radius:18px}.overlay{position:fixed;inset:0;background:rgba(0,0,0,.86);color:white;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}.overlay-inner{max-width:760px}.start-button{background:#4ade80;color:#111;font-size:42px;font-weight:900;min-height:120px;width:100%;margin-top:24px}.sound-note{font-size:26px;line-height:1.45}.hidden{display:none!important}@media(max-width:520px){.emoji{font-size:82px}.label{font-size:34px}button{min-height:185px}.grid{gap:12px;padding:12px}.orientation-main{font-size:34px}.orientation-sub{font-size:26px}.lang-bar button{font-size:24px;min-height:76px}}
+</style>
+</head>
+<body>
+<div class="overlay" id="soundOverlay"><div class="overlay-inner"><div style="font-size:72px;">🔊</div><div style="font-size:42px;font-weight:900;">請先啟用聲音</div><div class="sound-note">手機與平板通常會擋住自動播放。<br>請先按下方按鈕，再開始使用。</div><button class="start-button" onclick="unlockVoice()">啟用聲音並開始</button></div></div>
+<header>ICU 定向與溝通平板</header>
+<section class="orientation" id="orientationBox"><div class="orientation-main" id="orientationMain">🏥 你現在在加護病房</div><div class="orientation-sub" id="orientationSub">醫師和護理師正在照顧你。家人知道你在這裡。請放心。</div></section>
+<div class="status" id="status">請點選你想表達的需求</div>
+<div class="lang-bar"><button onclick="setLanguage('zh')">中文</button><button onclick="setLanguage('tw')">台語</button><button onclick="setLanguage('en')">English</button></div>
+<main>
+<section id="mainPage"><div class="page-title" id="mainTitle">常用需求</div><div class="grid" id="mainGrid"></div></section>
+<section id="painSitePage" class="hidden"><div class="page-title" id="painSiteTitle">痛在哪裡？</div><div class="grid" id="painSiteGrid"></div></section>
+<section id="painScorePage" class="hidden"><div class="page-title" id="painScoreTitle">疼痛分數？</div><div class="grid" id="painScoreGrid"></div></section>
+<section id="communicationPage" class="hidden"><div class="page-title" id="communicationTitle">溝通輔助</div><div class="grid" id="communicationGrid"></div></section>
+<section id="yesNoPage" class="hidden"><div class="page-title" id="yesNoTitle">請回答</div><div class="grid" id="yesNoGrid"></div></section>
+<section id="orientationPage" class="hidden"><div class="page-title" id="orientationTitle">定向提醒</div><div class="grid" id="orientationGrid"></div></section>
+</main>
+<nav class="nav"><button onclick="showPage('mainPage')" id="navHome">🏠 首頁</button><button onclick="repeatLast()" id="navRepeat">🔁 重複</button><button onclick="speakKey('slow')" id="navSlow">🐢 慢一點</button><button onclick="speakKey('dont_understand')" id="navDontUnderstand">❓ 聽不懂</button></nav>
+<script>
+const CONFIG={hospital:"奇美醫院加護病房",audioBasePath:"audio"};
+let currentLang="zh",selectedPainSiteKey="",lastText="",lastAudioKey="";
+const I18N={
+zh:{mainTitle:"常用需求",painSiteTitle:"痛在哪裡？",painScoreTitle:"疼痛分數？",communicationTitle:"溝通輔助",yesNoTitle:"請回答",orientationTitle:"定向提醒",home:"首頁",repeat:"重複",slow:"慢一點",dontUnderstand:"聽不懂",statusDefault:"請點選你想表達的需求",day:"☀️ 現在是白天",night:"🌙 現在是夜晚，請安心休息",audioLang:"zh-TW",texts:{suction:"我要抽痰",turn:"我要翻身",dry_mouth:"我嘴巴很乾",drink_water:"我想喝水",sit_up:"我想坐起來",pain:"我會痛",breathless:"我喘不過氣",family:"我想見家人",urine:"我想尿尿",stool:"我想大便",vomit:"我想吐",insomnia:"我睡不著",discharge:"我要出院",extubation:"我什麼時候可以拔管",cold:"我很冷",hot:"我很熱",glasses:"我的眼鏡在哪裡",slow:"請說慢一點",dont_understand:"我聽不懂",repeat_again:"請再說一次",know:"我知道了",disagree:"我不同意",stop:"請停一下",yes:"是",no:"否",unknown:"我不知道",where:"我在哪裡",what_time:"現在幾點",reassure:"你現在在"+CONFIG.hospital+"。你正在接受治療。醫師和護理師正在照顧你。家人知道你在這裡。請放心。",opening:"這是加護病房溝通平板，請點選你想表達的需求。",back_home:"回首頁",reselect_site:"重選部位"},painSites:{head:"頭",throat:"喉嚨或管子",chest:"胸口",abdomen:"肚子",back:"背部",limbs:"手腳",wound:"傷口"},painResult:(site,score,level)=>"我"+site+"痛，疼痛分數"+score+"分，"+level},
+tw:{mainTitle:"常用需求",painSiteTitle:"佗位疼？",painScoreTitle:"疼痛幾分？",communicationTitle:"溝通輔助",yesNoTitle:"請回答",orientationTitle:"定向提醒",home:"首頁",repeat:"閣講",slow:"慢一點",dontUnderstand:"聽無",statusDefault:"請點選你想欲講的代誌",day:"☀️ 這馬是日時",night:"🌙 這馬是暗時，請安心歇睏",audioLang:"zh-TW",texts:{suction:"我欲抽痰",turn:"我欲翻身",dry_mouth:"喙真焦",drink_water:"我欲啉水",sit_up:"我欲坐起來",pain:"我會疼",breathless:"我袂喘氣",family:"我欲看厝內人",urine:"我欲放尿",stool:"我欲大便",vomit:"我欲吐",insomnia:"我睏袂去",discharge:"我欲出院",extubation:"我啥時會當拔管",cold:"我真寒",hot:"我真熱",glasses:"我的目鏡佇佗位",slow:"請講較慢咧",dont_understand:"我聽無",repeat_again:"請閣講一次",know:"我知影矣",disagree:"我無同意",stop:"請停一下",yes:"有",no:"無",unknown:"我毋知",where:"我佇佗位",what_time:"這馬幾點",reassure:"你現在佇"+CONFIG.hospital+"。你咧接受治療。醫師佮護理師咧照顧你。厝內人知影你佇遮。請放心。",opening:"這是加護病房溝通平板，若有需要，請點你想講的圖。",back_home:"回首頁",reselect_site:"重選部位"},painSites:{head:"頭",throat:"喉嚨或管仔",chest:"胸坎",abdomen:"腹肚",back:"背脊",limbs:"手跤",wound:"傷口"},painResult:(site,score,level)=>site+"疼，疼痛分數"+score+"分"},
+en:{mainTitle:"Needs",painSiteTitle:"Where is the pain?",painScoreTitle:"Pain score?",communicationTitle:"Communication",yesNoTitle:"Please answer",orientationTitle:"Orientation",home:"Home",repeat:"Repeat",slow:"Slow",dontUnderstand:"Don’t understand",statusDefault:"Please choose what you want to say",day:"☀️ It is daytime",night:"🌙 It is nighttime. Please rest.",audioLang:"en-US",texts:{suction:"I need suction",turn:"Please turn me",dry_mouth:"My mouth is dry",drink_water:"I want water",sit_up:"I want to sit up",pain:"I have pain",breathless:"I cannot breathe",family:"I want to see my family",urine:"I need to urinate",stool:"I need to have a bowel movement",vomit:"I feel like vomiting",insomnia:"I cannot sleep",discharge:"I want to go home",extubation:"When can the tube be removed?",cold:"I feel cold",hot:"I feel hot",glasses:"Where are my glasses?",slow:"Please speak slowly",dont_understand:"I do not understand",repeat_again:"Please say it again",know:"I understand",disagree:"I disagree",stop:"Please stop",yes:"Yes",no:"No",unknown:"I do not know",where:"Where am I?",what_time:"What time is it?",reassure:"You are in the ICU. Doctors and nurses are taking care of you. Your family knows you are here. You are safe.",opening:"This is the ICU communication board. Please choose what you want to say.",back_home:"Back home",reselect_site:"Choose again"},painSites:{head:"head",throat:"throat or tube",chest:"chest",abdomen:"abdomen",back:"back",limbs:"arms or legs",wound:"wound"},painResult:(site,score,level)=>"My "+site+" hurts. Pain score "+score+" out of 10."}
+};
+function t(){return I18N[currentLang]}
+const mainButtons=[["pain","😖","pain",()=>showPage("painSitePage")],["suction","🫁","danger"],["turn","🔄","care"],["dry_mouth","💧","water"],["drink_water","🥤","water"],["breathless","😰","danger"],["discharge","🏠","home"],["extubation","🧑‍⚕️","info"],["sit_up","🛏️","care"],["family","👪","family"],["urine","🚽","toilet"],["stool","💩","toilet"],["vomit","🤢","danger"],["cold","❄️","info"],["hot","🔥","danger"],["glasses","👓","comm"],["insomnia","😴","sleep"],["where","🧭","info",()=>showPage("orientationPage")],["yes","✅❌","comm",()=>showPage("yesNoPage")],["dont_understand","❓","comm"],["slow","🐢","comm"]];
+const painSites=[["head","🤕"],["throat","🗣️"],["chest","🫀"],["abdomen","🤢"],["back","🔙"],["limbs","🦵"],["wound","🩹"]];
+const painScores=[["0","🙂","不痛"],["2","😐","有一點痛"],["4","😣","中等痛"],["6","😖","很痛"],["8","😭","非常痛"],["10","🆘","痛到受不了"]];
+const communicationButtons=[["repeat_again","🔁","comm",()=>repeatLast()],["slow","🐢","comm"],["dont_understand","❓","comm"],["know","👍","comm"],["disagree","👎","comm"],["stop","✋","comm"],["yes","✅❌","comm",()=>showPage("yesNoPage")]];
+const yesNoButtons=[["yes","✅","yes"],["no","❌","no"],["unknown","🤷","comm"],["repeat_again","🔁","comm"]];
+const orientationButtons=[["reassure","❤️","info"],["where","🏥","info"],["what_time","🕘","info",()=>speakTime()],["family","👪","family"]];
+function unlockVoice(){document.getElementById("soundOverlay").style.display="none";renderAll();if(currentLang==="tw"){speakKey("opening")}else{fallbackSpeak(currentLang==="en"?"Sound is enabled":"聲音已啟用",false)}}
+function setLanguage(lang){currentLang=lang;renderAll();speakKey("reassure")}
+function renderAll(){
+  updateOrientation();
+  document.getElementById("mainTitle").innerText=t().mainTitle;
+  document.getElementById("painSiteTitle").innerText=t().painSiteTitle;
+  document.getElementById("painScoreTitle").innerText=t().painScoreTitle;
+  document.getElementById("communicationTitle").innerText=t().communicationTitle;
+  document.getElementById("yesNoTitle").innerText=t().yesNoTitle;
+  document.getElementById("orientationTitle").innerText=t().orientationTitle;
+  document.getElementById("navHome").innerText="🏠 "+t().home;
+  document.getElementById("navRepeat").innerText="🔁 "+t().repeat;
+  document.getElementById("navSlow").innerText="🐢 "+t().slow;
+  document.getElementById("navDontUnderstand").innerText="❓ "+t().dontUnderstand;
+  document.getElementById("status").innerText=t().statusDefault;
+  renderMain();renderPainSites();renderPainScores();renderCommunication();renderYesNo();renderOrientationPage();
+}
+function makeButton(key,emoji,cls,custom){const btn=document.createElement("button");btn.className=cls;btn.onclick=custom||(()=>speakKey(key));btn.innerHTML=`<span class="emoji">${emoji}</span><span class="label">${t().texts[key]||key}</span>`;return btn}
+function makeBackButton(page,label){const btn=document.createElement("button");btn.className="back";btn.onclick=()=>showPage(page);btn.innerHTML=`<span class="emoji">🏠</span><span class="label">${label}</span>`;return btn}
+function renderMain(){const g=document.getElementById("mainGrid");g.innerHTML="";mainButtons.forEach(x=>g.appendChild(makeButton(...x)))}
+function renderPainSites(){const g=document.getElementById("painSiteGrid");g.innerHTML="";painSites.forEach(([key,emoji])=>{const b=document.createElement("button");b.className="pain";b.onclick=()=>selectPainSite(key);b.innerHTML=`<span class="emoji">${emoji}</span><span class="label">${t().painSites[key]}</span>`;g.appendChild(b)});g.appendChild(makeBackButton("mainPage",t().texts.back_home))}
+function renderPainScores(){const g=document.getElementById("painScoreGrid");g.innerHTML="";painScores.forEach(([score,emoji,level])=>{const b=document.createElement("button");b.onclick=()=>selectPainScore(score,level);b.innerHTML=`<span class="emoji">${emoji}</span><span class="label">${score} / 10</span>`;g.appendChild(b)});g.appendChild(makeBackButton("painSitePage",t().texts.reselect_site));g.appendChild(makeBackButton("mainPage",t().texts.back_home))}
+function renderCommunication(){const g=document.getElementById("communicationGrid");g.innerHTML="";communicationButtons.forEach(x=>g.appendChild(makeButton(...x)));g.appendChild(makeBackButton("mainPage",t().texts.back_home))}
+function renderYesNo(){const g=document.getElementById("yesNoGrid");g.innerHTML="";yesNoButtons.forEach(x=>g.appendChild(makeButton(...x)));g.appendChild(makeBackButton("mainPage",t().texts.back_home))}
+function renderOrientationPage(){const g=document.getElementById("orientationGrid");g.innerHTML="";orientationButtons.forEach(x=>g.appendChild(makeButton(...x)));g.appendChild(makeBackButton("mainPage",t().texts.back_home))}
+function showPage(pageId){["mainPage","painSitePage","painScorePage","communicationPage","yesNoPage","orientationPage"].forEach(id=>document.getElementById(id).classList.add("hidden"));document.getElementById(pageId).classList.remove("hidden");document.getElementById("status").innerText=t().statusDefault;window.scrollTo({top:0,behavior:"smooth"})}
+function speakKey(key){const text=t().texts[key]||key;lastText=text;lastAudioKey=key;document.getElementById("status").innerText=text;playAudioOrSpeak(key,text)}
+function repeatLast(){if(lastText){document.getElementById("status").innerText=lastText;playAudioOrSpeak(lastAudioKey,lastText,true)}else{speakKey("reassure")}}
+function selectPainSite(siteKey){selectedPainSiteKey=siteKey;showPage("painScorePage");document.getElementById("status").innerText=t().painSites[siteKey]}
+function selectPainScore(score,level){const site=t().painSites[selectedPainSiteKey];const result=t().painResult(site,score,level);lastText=result;lastAudioKey="";document.getElementById("status").innerText=result;fallbackSpeak(result,false)}
+function speakTime(){const now=new Date(),h=now.getHours(),m=String(now.getMinutes()).padStart(2,"0");let text=currentLang==="en"?`The time is ${h}:${m}`:currentLang==="tw"?`這馬是 ${h} 點 ${m} 分`:`現在時間是 ${h} 點 ${m} 分`;lastText=text;lastAudioKey="";document.getElementById("status").innerText=text;fallbackSpeak(text,false)}
+function updateOrientation(){
+  const h=new Date().getHours(),box=document.getElementById("orientationBox");
+  const dayNight=(h>=6&&h<18)?t().day:t().night;
+  if(h>=6&&h<18)box.classList.remove("night");else box.classList.add("night");
+
+  let main="", sub="";
+  if(currentLang==="en"){
+    main="🏥 You are in the ICU";
+    sub=dayNight+". Doctors and nurses are taking care of you. Your family knows you are here. You are safe.";
+  }else if(currentLang==="tw"){
+    main="🏥 你現在佇"+CONFIG.hospital;
+    sub=dayNight+"。醫師佮護理師咧照顧你。厝內人知影你佇遮。請放心。";
+  }else{
+    main="🏥 你現在在"+CONFIG.hospital;
+    sub=dayNight+"。醫師和護理師正在照顧你。家人知道你在這裡。請放心。";
+  }
+  document.getElementById("orientationMain").innerText=main;
+  document.getElementById("orientationSub").innerText=sub;
+}
+function playAudioOrSpeak(key,text,slow=false){const audioPath=`${CONFIG.audioBasePath}/${currentLang}/${key}.mp3`;const audio=new Audio(audioPath);audio.oncanplaythrough=()=>{audio.currentTime=0;audio.play().catch(()=>fallbackSpeak(text,slow))};audio.onerror=()=>fallbackSpeak(text,slow);audio.load()}
+function fallbackSpeak(text,slow){if(!("speechSynthesis" in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=t().audioLang;u.rate=slow?.55:.8;u.volume=1;speechSynthesis.speak(u)}catch(e){}}
+document.addEventListener("DOMContentLoaded",()=>{renderAll();setInterval(updateOrientation,60000)});
+</script>
+</body>
+</html>

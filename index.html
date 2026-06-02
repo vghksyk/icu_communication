@@ -143,7 +143,7 @@ function btn(label,emoji,cls,fn){
   b.innerHTML = iconHtml + `<span class="label">${label}</span>`;
   return b
 }
-function renderMain(){mainGrid.innerHTML="";items.forEach(([k,e,c])=>{let txt=T().p[k];if(k==="pain")mainGrid.appendChild(btn(txt,e,c,()=>show("painPage")));else if(k==="time")mainGrid.appendChild(btn(txt,e,c,()=>speakPeriod()));else mainGrid.appendChild(btn(txt,e,c,()=>speak(txt,k)))});mainGrid.appendChild(btn(T().c.yes+" / "+T().c.no,"✅❌","comm",()=>show("yesNoPage")));mainGrid.appendChild(btn(T().commTitle,"💬","comm",()=>show("commPage")))}
+function renderMain(){mainGrid.innerHTML="";items.forEach(([k,e,c])=>{let txt=T().p[k];if(k==="pain")mainGrid.appendChild(btn(txt,e,c,()=>show("painPage")));else if(k==="time")mainGrid.appendChild(btn(txt,e,c,()=>speakPeriod()));else if(k==="vomit")mainGrid.appendChild(btn(txt,e,c,()=>speak(txt,"vomit")));else mainGrid.appendChild(btn(txt,e,c,()=>speak(txt,k)))});mainGrid.appendChild(btn(T().c.yes+" / "+T().c.no,"✅❌","comm",()=>show("yesNoPage")));mainGrid.appendChild(btn(T().commTitle,"💬","comm",()=>show("commPage")))}
 function emotionText(k){
   const map = {
     zh: {

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>ICU 溝通與定向平板 V2.9｜多語整合＋長者模式</title>
+<title>ICU 溝通與定向平板 V2.9｜多語整合＋長者模式＋互動定向模式</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Microsoft JhengHei","Noto Sans TC",Arial,sans-serif;background:#f2f4f6;color:#111827}header{background:#1f2933;color:white;padding:16px;text-align:center}header .main{font-size:34px;font-weight:900}header .credit{font-size:22px;font-weight:800;margin-top:6px}header .ver{font-size:18px;font-weight:700;margin-top:4px;opacity:.9}.ori{background:#fff8e1;border-bottom:5px solid #ffcc80;padding:18px;text-align:center}.ori.night{background:#1e293b;color:white}.ori-main{font-size:40px;font-weight:900;line-height:1.25}.ori-sub{font-size:28px;font-weight:800;line-height:1.35;margin-top:8px}.status{background:#fff3cd;padding:16px;text-align:center;font-size:30px;font-weight:900;min-height:72px}.lang{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px;background:#e5e7eb}.lang button{min-height:80px;font-size:26px;font-weight:900;border-radius:18px}.title{padding:14px 16px 0;font-size:34px;font-weight:900}.note{padding:8px 16px 0;font-size:24px;font-weight:800;color:#374151;line-height:1.35}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;padding:16px}button{border:0;border-radius:28px;min-height:205px;padding:14px;background:white;box-shadow:0 5px 12px rgba(0,0,0,.18);touch-action:manipulation;cursor:pointer}button:active{transform:scale(.96);filter:brightness(.93)}.emoji{font-size:92px;display:block;line-height:1.05}.label{font-size:36px;font-weight:900;display:block;line-height:1.15}.sub{font-size:25px;font-weight:800;color:#374151;display:block;line-height:1.2;margin-top:8px}.danger{background:#ffcdd2}.care{background:#c8e6c9}.water{background:#bbdefb}.pain{background:#ffe0b2}.family{background:#e1bee7}.toilet{background:#d7ccc8}.sleep{background:#d1c4e9}.comm{background:#f8bbd0}.yes{background:#a5d6a7}.no{background:#ef9a9a}.info{background:#b2ebf2}.back{background:#e5e7eb}.home{background:#fde68a}.safety{background:#fee2e2;margin:12px 16px;padding:16px;border-radius:18px;font-size:23px;line-height:1.45;font-weight:800}.nav{position:sticky;bottom:0;background:rgba(242,244,246,.96);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 10px 14px;border-top:1px solid #d1d5db}.nav button{min-height:76px;font-size:20px;font-weight:900;border-radius:18px;padding:8px}.overlay{position:fixed;inset:0;background:rgba(0,0,0,.86);color:white;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}.start{background:#4ade80;color:#111;font-size:42px;font-weight:900;min-height:120px;width:100%;margin-top:24px}.hidden{display:none!important}@media(max-width:520px){.emoji{font-size:76px}.label{font-size:31px}button{min-height:176px}.grid{gap:12px;padding:12px}.ori-main{font-size:32px}.ori-sub{font-size:24px}.lang button{font-size:22px}.nav button{font-size:17px}}
 
@@ -277,15 +277,201 @@ body.elder-active .nav{
   }
 }
 
+
+/* ===== 互動定向與注意力輔助模式 ===== */
+.mode-tabs{
+  grid-template-columns:repeat(3,1fr) !important;
+}
+#interactivePage{display:none;}
+body.interactive-active #interactivePage{display:block;}
+body.interactive-active #ori,
+body.interactive-active #status,
+body.interactive-active .lang,
+body.interactive-active #mainPage,
+body.interactive-active #painPage,
+body.interactive-active #scorePage,
+body.interactive-active #yesNoPage,
+body.interactive-active #commPage,
+body.interactive-active #oriPage,
+body.interactive-active #elderPage,
+body.interactive-active .nav{
+  display:none !important;
+}
+body.interactive-active{
+  background:#ffffff;
+}
+.interactive-wrap{
+  background:#ffffff;
+  color:#000000;
+  min-height:calc(100vh - 170px);
+  padding:18px;
+}
+.interactive-title{
+  text-align:center;
+  font-size:clamp(32px,5vw,52px);
+  font-weight:900;
+  line-height:1.15;
+  margin:8px 0 6px;
+}
+.interactive-subtitle{
+  max-width:1120px;
+  margin:0 auto 16px;
+  text-align:center;
+  font-size:clamp(20px,3.2vw,30px);
+  font-weight:900;
+  color:#222;
+  line-height:1.35;
+}
+.interactive-warning{
+  max-width:1120px;
+  margin:0 auto 18px;
+  padding:14px;
+  border:4px solid #92400e;
+  border-radius:18px;
+  background:#fffbeb;
+  color:#451a03;
+  font-size:clamp(18px,2.8vw,26px);
+  font-weight:900;
+  line-height:1.35;
+  text-align:center;
+}
+.interactive-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px;
+  max-width:1120px;
+  margin:0 auto;
+}
+.interactive-menu-btn,
+.interactive-action-btn,
+.interactive-answer-btn{
+  min-height:138px;
+  border:5px solid #000;
+  border-radius:24px;
+  background:#fff;
+  color:#000;
+  box-shadow:0 7px 0 #000;
+  padding:14px;
+  font-size:clamp(28px,4.6vw,48px);
+  font-weight:900;
+  line-height:1.15;
+  cursor:pointer;
+}
+.interactive-menu-btn:active,
+.interactive-action-btn:active,
+.interactive-answer-btn:active{
+  transform:translateY(5px);
+  box-shadow:0 2px 0 #000;
+}
+.interactive-card{
+  max-width:1120px;
+  margin:0 auto;
+  border:5px solid #000;
+  border-radius:26px;
+  padding:18px;
+  background:#fff;
+}
+.interactive-prompt{
+  min-height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  white-space:pre-line;
+  padding:16px;
+  border:4px solid #111;
+  border-radius:22px;
+  background:#f8fafc;
+  font-size:clamp(32px,5.4vw,58px);
+  font-weight:900;
+  line-height:1.25;
+}
+.interactive-small{
+  font-size:clamp(18px,2.8vw,24px);
+  font-weight:800;
+  color:#333;
+  line-height:1.35;
+  margin-top:12px;
+  text-align:center;
+}
+.interactive-actions,
+.interactive-answers{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin-top:16px;
+}
+.interactive-answer-btn.correct{
+  background:#dcfce7;
+  border-color:#166534;
+}
+.interactive-answer-btn.wrong{
+  background:#fee2e2;
+  border-color:#991b1b;
+}
+.interactive-result{
+  margin-top:16px;
+  padding:14px;
+  border:4px solid #111;
+  border-radius:18px;
+  min-height:72px;
+  font-size:clamp(24px,3.8vw,40px);
+  font-weight:900;
+  line-height:1.25;
+  text-align:center;
+  background:#fef3c7;
+}
+.interactive-log{
+  max-width:1120px;
+  margin:18px auto 0;
+  border:4px solid #000;
+  border-radius:20px;
+  padding:14px;
+  background:#f8fafc;
+}
+.interactive-log-title{
+  font-size:clamp(24px,3.8vw,36px);
+  font-weight:900;
+  margin-bottom:8px;
+}
+.interactive-log-list{
+  max-height:260px;
+  overflow:auto;
+  font-size:clamp(18px,2.8vw,26px);
+  font-weight:800;
+  line-height:1.45;
+}
+.interactive-log-list div{
+  padding:8px 0;
+  border-bottom:2px solid #ddd;
+}
+@media(max-width:700px){
+  .mode-tabs{grid-template-columns:1fr !important;}
+  .interactive-grid,
+  .interactive-actions,
+  .interactive-answers{
+    grid-template-columns:1fr;
+  }
+  .interactive-menu-btn,
+  .interactive-action-btn,
+  .interactive-answer-btn{
+    min-height:112px;
+  }
+  .interactive-prompt{
+    min-height:130px;
+  }
+}
+
 </style>
 </head>
 <body>
 <div class="overlay" id="overlay"><div><div style="font-size:72px">🔊</div><div style="font-size:42px;font-weight:900">請先啟用聲音</div><div style="font-size:26px;line-height:1.45">請先按下方按鈕，系統會報時並告知目前所在單位。</div><button class="start" onclick="unlockVoice()">啟用聲音並報時定位</button></div></div>
-<header><div class="main">ICU 溝通與定向平板</div><div class="credit">臨床構想與原型設計：洪苡瑾</div><div class="ver">V2.9 多語整合版｜一般模式＋長者模式</div></header>
+<header><div class="main">ICU 溝通與定向平板</div><div class="credit">臨床構想與原型設計：洪苡瑾</div><div class="ver">V2.9 多語整合版｜一般模式＋長者模式＋互動定向模式</div></header>
 
 <div class="mode-tabs" id="modeTabs">
   <button id="modeNormalBtn" class="active" type="button" onclick="switchMode('normal')">🌐 一般多語模式<span class="small">完整功能／多國語言</span></button>
   <button id="modeElderBtn" type="button" onclick="switchMode('elder')">👵 長者模式<span class="small">超大按鈕／高對比</span></button>
+<button id="modeInteractiveBtn" type="button" onclick="switchMode('interactive')">🧠 互動定向<span class="small">注意力／小練習</span></button>
 </div>
 
 <section class="ori" id="ori"><div class="ori-main" id="oriMain">🏥 你現在在加護病房</div><div class="ori-sub" id="dateDisplay" style="font-size:32px;font-weight:900;margin-top:8px;"></div><div class="ori-sub" id="timeDisplay" style="font-size:34px;font-weight:900;margin-top:8px;"></div><div class="ori-sub" id="oriSub">醫療團隊正在照顧你。家人知道你在這裡。請放心。</div></section>
@@ -360,6 +546,45 @@ body.elder-active .nav{
     <div class="elder-hint">按一下會播放語音。若聲音重疊，請按右上角「停止播放」。</div>
   </div>
 </section>
+
+
+<section id="interactivePage" aria-label="互動定向與注意力輔助模式">
+  <div class="interactive-wrap">
+    <div class="interactive-title">互動定向與注意力輔助模式</div>
+    <div class="interactive-subtitle">給護理師 bedside 使用的小練習：協助觀察注意力、理解力與定向反應。</div>
+    <div class="interactive-warning">本模式僅作為互動與觀察輔助，不判定譫妄陽性或陰性；正式評估仍依單位 CAM-ICU／ICDSC 流程。</div>
+
+    <div id="interactiveHome" class="interactive-grid">
+      <button class="interactive-menu-btn" type="button" onclick="startInteractiveCategory('command')">👂 聽指令</button>
+      <button class="interactive-menu-btn" type="button" onclick="startInteractiveCategory('yesno')">✅ 是／不是</button>
+      <button class="interactive-menu-btn" type="button" onclick="startInteractiveCategory('orientation')">🏥 定向問答</button>
+      <button class="interactive-menu-btn" type="button" onclick="startInteractiveCategory('picture')">🖼️ 找圖片</button>
+      <button class="interactive-menu-btn" type="button" onclick="startInteractiveCategory('memory')">🍎 簡單記憶</button>
+      <button class="interactive-menu-btn" type="button" onclick="renderInteractiveLogOnly()">📝 護理師紀錄</button>
+    </div>
+
+    <div id="interactiveCard" class="interactive-card hidden">
+      <div id="interactivePrompt" class="interactive-prompt">請選擇一個練習</div>
+      <div id="interactiveNote" class="interactive-small"></div>
+      <div id="interactiveAnswers" class="interactive-answers"></div>
+      <div class="interactive-actions">
+        <button class="interactive-action-btn" type="button" onclick="playInteractivePrompt()">🔊 播放題目</button>
+        <button class="interactive-action-btn" type="button" onclick="nextInteractiveQuestion()">➡️ 下一題</button>
+        <button class="interactive-action-btn" type="button" onclick="recordInteractive('完成')">✅ 完成</button>
+        <button class="interactive-action-btn" type="button" onclick="recordInteractive('無法配合')">⚪ 無法配合</button>
+        <button class="interactive-action-btn" type="button" onclick="showInteractiveHome()">🏠 回練習首頁</button>
+        <button class="interactive-action-btn" type="button" onclick="stopPlayback()">⏹ 停止播放</button>
+      </div>
+      <div id="interactiveResult" class="interactive-result">請播放題目或讓病人作答。</div>
+    </div>
+
+    <div class="interactive-log">
+      <div class="interactive-log-title">本次互動紀錄</div>
+      <div id="interactiveLogList" class="interactive-log-list">尚無紀錄。</div>
+    </div>
+  </div>
+</section>
+
 
 <script>
 const CONFIG={hospital:"奇美醫院加護病房",audioBasePath:"audio"};
@@ -861,24 +1086,39 @@ function bindAutoStopOnLeave(){
 document.addEventListener("DOMContentLoaded",()=>{render();bindAutoStopOnLeave();setInterval(updateOri,60000)});
 
 
-/* ===== 長者模式整合功能 ===== */
+
+/* ===== 長者模式＋互動定向模式整合功能 ===== */
 function switchMode(mode){
   stopPlayback();
   const isElder = mode === "elder";
+  const isInteractive = mode === "interactive";
+
   document.body.classList.toggle("elder-active", isElder);
+  document.body.classList.toggle("interactive-active", isInteractive);
+
   const normalBtn = document.getElementById("modeNormalBtn");
   const elderBtn = document.getElementById("modeElderBtn");
-  if(normalBtn) normalBtn.classList.toggle("active", !isElder);
+  const interactiveBtn = document.getElementById("modeInteractiveBtn");
+
+  if(normalBtn) normalBtn.classList.toggle("active", mode === "normal");
   if(elderBtn) elderBtn.classList.toggle("active", isElder);
+  if(interactiveBtn) interactiveBtn.classList.toggle("active", isInteractive);
+
   if(isElder){
     lang = "zh";
     render();
+  }else if(isInteractive){
+    lang = "zh";
+    render();
+    showInteractiveHome();
   }else{
     show("mainPage");
   }
+
   window.scrollTo({top:0,behavior:"smooth"});
   setTimeout(()=>{openingAlreadyPlayed=false;speakOpening();},120);
 }
+
 function speakElder(key){
   if(lang !== "zh"){
     lang = "zh";
@@ -893,6 +1133,189 @@ function speakElder(key){
     family: T().p.family
   };
   speak(phraseMap[key] || "請再選一次", key);
+}
+
+/* ===== 互動定向與注意力輔助模式 ===== */
+const INTERACTIVE_BANK = {
+  command: [
+    {
+      label:"聽到 8 請舉手",
+      prompt:"請聽好：聽到 8 請舉手。
+現在開始：3、5、8、2。",
+      note:"若病人無法舉手，可改成眨眼、點頭或握手反應。",
+      answers:[]
+    },
+    {
+      label:"請握我的手",
+      prompt:"請握我的手。現在請放開。",
+      note:"觀察病人是否能理解並執行簡單指令。",
+      answers:[]
+    },
+    {
+      label:"聽到 3 請眨眼",
+      prompt:"請聽好：聽到 3 請眨眼。
+現在開始：1、7、3、9。",
+      note:"適合手部無法配合但可眨眼反應者。",
+      answers:[]
+    }
+  ],
+  yesno: [
+    {label:"石頭會浮在水面上嗎？", prompt:"石頭會浮在水面上嗎？", answer:"不是", answers:["是","不是","我不知道"]},
+    {label:"魚會在水裡游泳嗎？", prompt:"魚會在水裡游泳嗎？", answer:"是", answers:["是","不是","我不知道"]},
+    {label:"冰是熱的嗎？", prompt:"冰是熱的嗎？", answer:"不是", answers:["是","不是","我不知道"]},
+    {label:"火是燙的嗎？", prompt:"火是燙的嗎？", answer:"是", answers:["是","不是","我不知道"]}
+  ],
+  orientation: [
+    {label:"你現在在醫院嗎？", prompt:"你現在在醫院嗎？", answer:"是", answers:["是","不是","我不知道"]},
+    {label:"這裡是家裡嗎？", prompt:"這裡是家裡嗎？", answer:"不是", answers:["是","不是","我不知道"]},
+    {label:"你現在正在接受治療嗎？", prompt:"你現在正在接受治療嗎？", answer:"是", answers:["是","不是","我不知道"]},
+    {label:"現在是晚上嗎？", prompt:"現在是晚上嗎？", answer:null, answers:["是","不是","我不知道"], dynamic:"night"}
+  ],
+  picture: [
+    {label:"請找出杯子", prompt:"請找出杯子。", answer:"杯子", answers:["杯子","床","時鐘","家人"], emoji:["🥤","🛏️","🕘","👪"]},
+    {label:"請找出床", prompt:"請找出床。", answer:"床", answers:["水","床","醫護人員","蘋果"], emoji:["💧","🛏️","🩺","🍎"]},
+    {label:"請找出時鐘", prompt:"請找出時鐘。", answer:"時鐘", answers:["時鐘","杯子","家人","床"], emoji:["🕘","🥤","👪","🛏️"]}
+  ],
+  memory: [
+    {label:"請記得：蘋果", prompt:"請記得：蘋果。
+等一下我會再問你。", answer:"蘋果", answers:["蘋果","杯子","車子","我不知道"], memory:true},
+    {label:"請記得：杯子", prompt:"請記得：杯子。
+等一下我會再問你。", answer:"杯子", answers:["蘋果","杯子","時鐘","我不知道"], memory:true}
+  ]
+};
+
+let interactiveCategory = null;
+let interactiveIndex = -1;
+let interactiveCurrent = null;
+let interactiveLogs = [];
+
+function showInteractiveHome(){
+  stopPlayback();
+  const home = document.getElementById("interactiveHome");
+  const card = document.getElementById("interactiveCard");
+  if(home) home.classList.remove("hidden");
+  if(card) card.classList.add("hidden");
+  updateInteractiveLog();
+}
+
+function renderInteractiveLogOnly(){
+  showInteractiveHome();
+  const result = document.getElementById("interactiveResult");
+  updateInteractiveLog();
+}
+
+function startInteractiveCategory(category){
+  interactiveCategory = category;
+  interactiveIndex = -1;
+  const home = document.getElementById("interactiveHome");
+  const card = document.getElementById("interactiveCard");
+  if(home) home.classList.add("hidden");
+  if(card) card.classList.remove("hidden");
+  nextInteractiveQuestion();
+}
+
+function nextInteractiveQuestion(){
+  if(!interactiveCategory) interactiveCategory = "command";
+  const bank = INTERACTIVE_BANK[interactiveCategory] || INTERACTIVE_BANK.command;
+  interactiveIndex = (interactiveIndex + 1) % bank.length;
+  interactiveCurrent = Object.assign({}, bank[interactiveIndex]);
+
+  if(interactiveCurrent.dynamic === "night"){
+    const h = new Date().getHours();
+    interactiveCurrent.answer = (h >= 18 || h < 6) ? "是" : "不是";
+  }
+
+  const prompt = document.getElementById("interactivePrompt");
+  const note = document.getElementById("interactiveNote");
+  const answers = document.getElementById("interactiveAnswers");
+  const result = document.getElementById("interactiveResult");
+
+  if(prompt) prompt.innerText = interactiveCurrent.prompt;
+  if(note) note.innerText = interactiveCurrent.note || "請依病人能力改用舉手、眨眼、點頭、握手或按螢幕回答。";
+  if(result) result.innerText = "請播放題目或讓病人作答。";
+
+  if(answers){
+    answers.innerHTML = "";
+    const opts = interactiveCurrent.answers || [];
+    opts.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "interactive-answer-btn";
+      const prefix = interactiveCurrent.emoji && interactiveCurrent.emoji[i] ? interactiveCurrent.emoji[i] + " " : "";
+      btn.innerText = prefix + opt;
+      btn.onclick = () => answerInteractive(opt, btn);
+      answers.appendChild(btn);
+    });
+  }
+  playInteractivePrompt();
+}
+
+function playInteractivePrompt(){
+  if(!interactiveCurrent) return;
+  let text = interactiveCurrent.prompt;
+  if(interactiveCurrent.memory && !text.includes("剛剛請你記得什麼")){
+    speak(text, "interactive");
+    setTimeout(() => {
+      const prompt = document.getElementById("interactivePrompt");
+      if(prompt) prompt.innerText = "剛剛請你記得什麼？";
+      interactiveCurrent.prompt = "剛剛請你記得什麼？";
+      speak("剛剛請你記得什麼？", "interactive");
+    }, 5500);
+  }else{
+    speak(text, "interactive");
+  }
+}
+
+function answerInteractive(answer, btn){
+  if(!interactiveCurrent) return;
+  const result = document.getElementById("interactiveResult");
+  const correct = interactiveCurrent.answer;
+  const allBtns = document.querySelectorAll(".interactive-answer-btn");
+  allBtns.forEach(b => b.classList.remove("correct","wrong"));
+
+  if(correct === null || correct === undefined){
+    if(result) result.innerText = "已記錄回答：" + answer;
+    recordInteractive("回答：" + answer);
+    return;
+  }
+
+  if(answer === correct){
+    if(btn) btn.classList.add("correct");
+    if(result) result.innerText = "答對／反應符合。";
+    recordInteractive("答對");
+  }else{
+    if(btn) btn.classList.add("wrong");
+    if(result) result.innerText = "答錯或反應不符合。正確答案：" + correct;
+    recordInteractive("答錯");
+  }
+}
+
+function recordInteractive(outcome){
+  if(!interactiveCurrent) return;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,"0");
+  const mm = String(now.getMinutes()).padStart(2,"0");
+  const item = hh + ":" + mm + "｜" + (interactiveCurrent.label || interactiveCurrent.prompt).replace(/
+/g," ") + "｜" + outcome;
+  interactiveLogs.unshift(item);
+  interactiveLogs = interactiveLogs.slice(0, 20);
+  updateInteractiveLog();
+  const result = document.getElementById("interactiveResult");
+  if(result && outcome !== "答對" && outcome !== "答錯") result.innerText = "已記錄：" + outcome;
+}
+
+function updateInteractiveLog(){
+  const list = document.getElementById("interactiveLogList");
+  if(!list) return;
+  if(interactiveLogs.length === 0){
+    list.innerText = "尚無紀錄。";
+    return;
+  }
+  list.innerHTML = "";
+  interactiveLogs.forEach(x => {
+    const div = document.createElement("div");
+    div.innerText = x;
+    list.appendChild(div);
+  });
 }
 </script>
 </body>
